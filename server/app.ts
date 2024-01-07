@@ -3,6 +3,8 @@ export const app = express();
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import { errorMiddleware } from './middleware/error';
+
 dotenv.config();
 //body parser;
 app.use(express.json({ limit: '50mb' }));
@@ -25,3 +27,5 @@ app.all('*', (req: Request, res: Response, next: NextFunction) => {
   err.statusCode = 404;
   next(err);
 });
+
+app.use(errorMiddleware);
