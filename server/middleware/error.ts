@@ -31,7 +31,7 @@ export const errorMiddleware = (
   //JWT expired error;
   if (err.name === 'TokenExpiredError') {
     const message = `Json web token is expired try again`;
-    err = new ErrorHandler(message, 4000);
+    err = new ErrorHandler(message, 400);
   }
   res.status(err.statusCode).json({
     success: false,
