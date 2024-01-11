@@ -1,3 +1,4 @@
+import { catchAsyncError } from './../middleware/catchAsyncError';
 import { Request, Response, NextFunction } from 'express';
 import userModel, { IUser } from '../models/user.model';
 import ErrorHandler from '../utils/errorHandler';
@@ -71,6 +72,33 @@ export const createActivationToken = (user: any): IActivationToken => {
     process.env.ACTIVATION_SECRET as Secret,
     { expiresIn: '5m' }
   );
-
   return { token, activationCode };
 };
+
+//activate user;
+interface IActivationUser {
+  activation_token: string;
+  activation_code: string;
+}
+
+export const activateUser = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { activation_token, activation_code } = req.body as IActivationUser;
+      const newUser: { user: IUser; activationCode: string } = jwt.verify(
+        activation_token,
+        process.env.ACTIVATION_SECRET as string
+      );
+      if (newUser.activationCode !== activation_token) {
+        return next(new ErrorHandler('Invalid action  code', 404));
+      }
+      const { email, name, password } = newUser.user;
+      const existUser = await userModel.findOne({ email });
+      if (existUser) {
+        return next(new ErrorHandler('user already exists', 400));
+      }
+      const user = await userModel.create({ email, name, password });
+      res.status(201).json({ success: true });
+    } catch (error) {}
+  }
+);

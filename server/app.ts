@@ -4,8 +4,9 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import { errorMiddleware } from './middleware/error';
-import userRouter from './routes/user.routes.ts';
+import userRouter from './routes/user.routes';
 dotenv.config();
+
 //body parser;
 app.use(express.json({ limit: '50mb' }));
 
