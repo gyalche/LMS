@@ -1,5 +1,6 @@
 import mongoose, { Document, Model, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 const emailRegexExpression: RegExp = /A[A-Z0-9+_.-]+@[A-Z0-9.-]+Z/;
 
 export interface IUser extends Document {
@@ -14,6 +15,8 @@ export interface IUser extends Document {
   isVerified: boolean;
   courses: Array<{ courseId: string }>;
   comparePassword: (password: string) => Promise<boolean>;
+  SignAccessToken: () => string;
+  SignRefreshToken: () => string;
 }
 
 const userSchema: Schema<IUser> = new mongoose.Schema(
@@ -70,5 +73,14 @@ userSchema.methods.comparePassword = async function (
   return bcrypt.compare(enteredpassword, this.password);
 };
 
+//sign access token
+userSchema.methods.SignAccessToken = function () {
+  return jwt.sign({ id: this._id }, process.env.ACCESS_TOKEN || '');
+};
+
+//sign refresh token;
+userSchema.methods.SignRefreshToken = function () {
+  return jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN || '');
+};
 const userModel: Model<IUser> = mongoose.model('User', userSchema);
 export default userModel;

@@ -85,11 +85,11 @@ export const activateUser = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { activation_token, activation_code } = req.body as IActivationUser;
-      const newUser: { user: IUser; activationCode: string } = jwt.verify(
+      const newUser: { user: IUser; activationCode: any } = jwt.verify(
         activation_token,
         process.env.ACTIVATION_SECRET as string
       );
-      if (newUser.activationCode !== activation_token) {
+      if (newUser.activationCode !== activation_code) {
         return next(new ErrorHandler('Invalid action  code', 404));
       }
       const { email, name, password } = newUser.user;
@@ -100,5 +100,33 @@ export const activateUser = catchAsyncError(
       const user = await userModel.create({ email, name, password });
       res.status(201).json({ success: true });
     } catch (error) {}
+  }
+);
+
+//login user;
+interface ILoginRequest {
+  email: string;
+  password: string;
+}
+
+export const loginUser = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        next(new ErrorHandler('Invalid credentials', 404));
+      }
+
+      const user = await userModel.findOne({ email }).select('+password');
+      if (!user) {
+        next(new ErrorHandler('user doesnt exist', 404));
+      }
+      const isPasswordMatch = await user?.comparePassword(password);
+      if (!isPasswordMatch) {
+        next(new ErrorHandler('password doesnt match', 404));
+      }
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 404));
+    }
   }
 );
