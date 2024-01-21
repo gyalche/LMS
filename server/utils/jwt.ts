@@ -16,6 +16,7 @@ export const sendToken = (user: IUser, statusCode: number, res: Response) => {
   const refreshToken = user.SignRefreshToken;
 
   //upload session to redis;
+  redis.set(user._id, JSON.stringify(user) as any);
 
   const accessTokenExpires = parseInt(
     process.env.ACCESS_TOKEN_EXPIRES || '300',
@@ -26,4 +27,33 @@ export const sendToken = (user: IUser, statusCode: number, res: Response) => {
     process.env.REFRESH_TOKEN_EXPIRES || '1200',
     10
   );
+
+  //options for cookies;
+  const accessTokenOptions: ITokenOptions = {
+    expires: new Date(Date.now() + accessTokenExpires * 1000),
+    maxAge: accessTokenExpires * 1000,
+    httpOnly: true,
+    sameSite: 'lax',
+  };
+
+  const refreshTokenOptions: ITokenOptions = {
+    expires: new Date(Date.now() + refreshTokenExpires * 1000),
+    maxAge: refreshTokenExpires * 1000,
+    httpOnly: true,
+    sameSite: 'lax',
+  };
+
+  //only set secure to true in production;
+  if (process.env.NODE_ENV === 'production') {
+    accessTokenOptions.secure = true;
+  }
+
+  res.cookie('access_token', accessToken, accessTokenOptions);
+  res.cookie('refresh_token', refreshToken, refreshTokenOptions);
+
+  res.status(statusCode).json({
+    success: true,
+    user,
+    accessToken,
+  });
 };

@@ -8,8 +8,8 @@ import dotenv from 'dotenv';
 import ejs from 'ejs';
 import path from 'path';
 import { sendMail } from '../utils/sendMail';
+import { sendToken } from '../utils/jwt';
 dotenv.config();
-
 //register user;
 interface IRegistrationBody {
   name: string;
@@ -32,7 +32,6 @@ export const registrationUser = catchAsyncError(
         password,
         avatar,
       };
-
       const activationToken = createActivationToken(user);
       const activationCode = activationToken.activationCode;
       const data = { user: { name: user.name }, activationCode };
@@ -116,7 +115,6 @@ export const loginUser = catchAsyncError(
       if (!email || !password) {
         next(new ErrorHandler('Invalid credentials', 404));
       }
-
       const user = await userModel.findOne({ email }).select('+password');
       if (!user) {
         next(new ErrorHandler('user doesnt exist', 404));
@@ -125,8 +123,24 @@ export const loginUser = catchAsyncError(
       if (!isPasswordMatch) {
         next(new ErrorHandler('password doesnt match', 404));
       }
+      sendToken(user, 200, res);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 404));
+    }
+  }
+);
+
+//logout user;
+export const logoutUser = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      res.cookie('access_token', '', { maxAge: 1 });
+      res.cookie('refresh_tokne', '', { maxAge: 1 });
+      res
+        .status(200)
+        .json({ success: true, message: 'user logout sucessfully' });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
     }
   }
 );
