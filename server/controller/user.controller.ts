@@ -216,7 +216,7 @@ interface ISocailAuthBody {
 export const socialAuth = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email, name, avatar } = req.body;
+      const { email, name, avatar } = req.body as ISocailAuthBody;
       const user = await userModel.findOne({ email });
       if (!user) {
         const newUser = await userModel.create({ email, name, avatar });
