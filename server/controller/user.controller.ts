@@ -93,7 +93,7 @@ export const activateUser = catchAsyncError(
       const newUser: { user: IUser; activationCode: any } = jwt.verify(
         activation_token,
         process.env.ACTIVATION_SECRET as string
-      );
+      ) as any;
       if (newUser.activationCode !== activation_code) {
         return next(new ErrorHandler('Invalid action  code', 404));
       }
@@ -121,7 +121,9 @@ export const loginUser = catchAsyncError(
       if (!email || !password) {
         next(new ErrorHandler('Invalid credentials', 404));
       }
-      const user = await userModel.findOne({ email }).select('+password');
+      const user = (await userModel
+        .findOne({ email })
+        .select('+password')) as any;
       if (!user) {
         next(new ErrorHandler('user doesnt exist', 404));
       }
@@ -164,7 +166,7 @@ export const updateAccessToken = catchAsyncError(
       if (!decoded) {
         next(new ErrorHandler('could not refresh token', 400));
       }
-      const session = await redis.get(decoded.id as string);
+      const session = (await redis.get(decoded.id as string)) as any;
       if (!session) {
         next(new ErrorHandler('could not refresh token', 400));
       }
