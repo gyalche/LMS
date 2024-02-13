@@ -5,6 +5,8 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import { errorMiddleware } from './middleware/error';
 import userRouter from './routes/user.routes';
+import courseRouter from './routes/course.routes';
+
 dotenv.config();
 
 //body parser;
@@ -18,6 +20,7 @@ app.use(cors({ origin: process.env.ORIGIN }));
 
 //Routes;
 app.use('/api/v1', userRouter);
+app.use('/api/v1', courseRouter);
 
 //unknown routes;
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
