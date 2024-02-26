@@ -2,6 +2,7 @@ import express from 'express';
 import {
   addAnswer,
   addQuestion,
+  addReview,
   editCourse,
   getAllCourse,
   getCourseByUser,
@@ -28,5 +29,6 @@ courseRouter.get('/get-courses', getAllCourse);
 courseRouter.get('/get-course-content/:id', isAuthenticate, getCourseByUser);
 courseRouter.put('/add-question', isAuthenticate, addQuestion);
 courseRouter.put('/add-answer', isAuthenticate, addAnswer);
+courseRouter.put('/add-review/:id', isAuthenticate, addReview);
 
 export default courseRouter;

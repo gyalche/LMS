@@ -235,7 +235,7 @@ export const addAnswer = catchAsyncError(
           await sendMail({
             email: question?.user.email,
             subject: 'Question reply',
-            template: 'quesstion-reply.ejs',
+            template: 'question-reply.ejs',
             data,
           });
         } catch (error: any) {
@@ -244,6 +244,68 @@ export const addAnswer = catchAsyncError(
       }
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 404));
+    }
+  }
+);
+
+//add review in course;
+interface IAddReviewData {
+  review: string;
+  rating: number;
+  userId: string;
+}
+
+export const addReview = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userCourseList = req?.user?.courses;
+      const courseId = req.params.id;
+
+      //check if the course id already exits in user course list based on _id;
+      const courseExist = userCourseList?.some(
+        (course: any) => course._id.toString() === courseId.toString()
+      );
+
+      if (!courseExist) {
+        return next(
+          new ErrorHandler('You are not eligible to access this course', 404)
+        );
+      }
+
+      const course = await courseModel.findById(courseId);
+      const { review, rating } = req.body as IAddReviewData;
+      const reviewData: any = {
+        user: req.user,
+        rating,
+        comment: review,
+      };
+
+      course?.reviews.push(reviewData);
+
+      let avg = 0;
+      course?.reviews.forEach((rev: any) => {
+        avg += rev.rating;
+      });
+
+      if (course) {
+        course.ratings = avg / course.reviews.length;
+      }
+
+      await course?.save();
+
+      const notification = {
+        title: 'New Review Received',
+        message: `${req.user?.name} has given a review in ${course?.name}`,
+      };
+
+      //create notification
+
+      res.status(200).json({
+        success: true,
+        course,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
     }
   }
 );
