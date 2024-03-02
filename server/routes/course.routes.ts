@@ -30,5 +30,11 @@ courseRouter.get('/get-course-content/:id', isAuthenticate, getCourseByUser);
 courseRouter.put('/add-question', isAuthenticate, addQuestion);
 courseRouter.put('/add-answer', isAuthenticate, addAnswer);
 courseRouter.put('/add-review/:id', isAuthenticate, addReview);
+courseRouter.put(
+  '/add-reply/:id',
+  isAuthenticate,
+  authorizeRoles('admin'),
+  addReview
+);
 
 export default courseRouter;
