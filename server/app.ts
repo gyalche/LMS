@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { errorMiddleware } from './middleware/error';
 import userRouter from './routes/user.routes';
 import courseRouter from './routes/course.routes';
+import orderRouter from './routes/order.routes';
 
 dotenv.config();
 
@@ -21,7 +22,7 @@ app.use(cors({ origin: process.env.ORIGIN }));
 //Routes;
 app.use('/api/v1', userRouter);
 app.use('/api/v1', courseRouter);
-
+app.use('/api/v1', orderRouter);
 //unknown routes;
 app.all('*', (req: Request, res: Response, next: NextFunction) => {
   const err = new Error(`Route ${req.originalUrl} not found`) as any;
