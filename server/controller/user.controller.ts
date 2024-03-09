@@ -13,7 +13,11 @@ import {
   sendToken,
 } from '../utils/jwt';
 import { redis } from '../utils/redis';
-import { getAllUsersService, getUserById } from '../services/user.service';
+import {
+  getAllUsersService,
+  getUserById,
+  updateUserRoleService,
+} from '../services/user.service';
 import cloudinary from 'cloudinary';
 dotenv.config();
 //register user;
@@ -349,6 +353,19 @@ export const getAllUsers = catchAsyncError(
       await getAllUsersService(res);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 404));
+    }
+  }
+);
+
+//update users role --admin;
+
+export const updateUserRole = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id, role } = req.body;
+      updateUserRoleService(res, id, role);
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
     }
   }
 );

@@ -1,5 +1,7 @@
 import { Response } from 'express';
 import userModel from '../models/user.model';
+import { catchAsyncError } from '../middleware/catchAsyncError';
+import ErrorHandler from '../utils/errorHandler';
 
 //get user by id;
 export const getUserById = async (id: any, res: Response) => {
@@ -17,4 +19,20 @@ export const getAllUsersService = async (res: Response) => {
     success: true,
     users,
   });
+};
+
+export const updateUserRoleService = async (
+  res: Response,
+  id: string,
+  role: string
+) => {
+  try {
+    const user = await userModel.findByIdAndUpdate(id, { role }, { new: true });
+    res.status(201).json({
+      success: true,
+      user,
+    });
+  } catch (error: any) {
+    return new ErrorHandler(error.message, 404);
+  }
 };

@@ -11,6 +11,7 @@ import {
   updatePassword,
   updateProfilePicture,
   updateUserInfo,
+  updateUserRole,
 } from '../controller/user.controller';
 import { authorizeRoles, isAuthenticate } from '../middleware/auth';
 const userRouter = express.Router();
@@ -31,5 +32,10 @@ userRouter.get(
   authorizeRoles('admin'),
   getAllUsers
 );
-
+userRouter.put(
+  '/update-user-role',
+  isAuthenticate,
+  authorizeRoles('admin'),
+  updateUserRole
+);
 export default userRouter;

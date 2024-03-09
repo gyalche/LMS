@@ -11,7 +11,7 @@ export const createCourse = catchAsyncError(
 );
 
 //get all courses;
-export const getAllCoursesServices = catchAsyncError(async (res: Response) => {
+export const getAllCoursesServices = async (res: Response) => {
   const course = await courseModel.find().sort({ createdAt: -1 });
   res.status(201).send({ success: true, course });
-});
+};

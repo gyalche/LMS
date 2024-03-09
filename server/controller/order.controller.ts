@@ -10,6 +10,7 @@ import { sendMail } from '../utils/sendMail';
 import NotificationModel from '../models/notification.model';
 import { getAllOrdersServices, newOrder } from '../services/order.service';
 import moment from 'moment';
+import { updateUserRoleService } from '../services/user.service';
 export const createOrder = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -82,7 +83,8 @@ export const createOrder = catchAsyncError(
 export const getAllOrders = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      getAllOrdersServices(res, next);
+      const { id, role } = req.body;
+      updateUserRoleService(res, id, role);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
