@@ -14,6 +14,7 @@ import ejs from 'ejs';
 import { sendMail } from '../utils/sendMail';
 import NotificationModel from '../models/notification.model';
 import { getAllCoursesServices } from '../services/course.service';
+import { updateUserRoleService } from '../services/user.service';
 //upload course;
 export const uploadCourse = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -368,6 +369,18 @@ export const getAllCourses = catchAsyncError(
       getAllCoursesServices(res);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 404));
+    }
+  }
+);
+
+//update user rle  --only for admin
+export const udpateUserRole = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id, role } = req.body;
+      await updateUserRoleService(res, id, role);
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
     }
   }
 );
