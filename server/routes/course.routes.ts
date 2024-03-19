@@ -3,6 +3,7 @@ import {
   addAnswer,
   addQuestion,
   addReview,
+  deleteCourse,
   editCourse,
   getAllCourse,
   getAllCourses,
@@ -38,10 +39,10 @@ courseRouter.put(
   addReview
 );
 courseRouter.get(
-  '/add-courses',
+  '/delete-courses/:id',
   isAuthenticate,
   authorizeRoles('admin'),
-  getAllCourses
+  deleteCourse
 );
 
 export default courseRouter;
