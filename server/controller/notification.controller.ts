@@ -9,7 +9,7 @@ export const getNotification = catchAsyncError(
     try {
       const notification = await NotificationModel.find().sort({
         createdAt: -1,
-      });
+      }); 
       res.status(201).json({
         success: true,
         notification,
